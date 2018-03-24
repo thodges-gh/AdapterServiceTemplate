@@ -38,3 +38,14 @@ Be sure to change the JobID to the given output from the last command.
 ```bash
 curl -u chainlink:twochains -X POST http://localhost:6688/v2/specs/a0de434162de4e37817d9f0b9c12da3d/runs
 ```
+
+## Example
+
+Here is an example of what the log would look like for a run
+
+```shell
+2018/03/24 15:17:52 Input:
+2018/03/24 15:17:52 {"id":"87a196436d084c608a748f6f98d0c1d6","data":{}}
+2018/03/24 15:17:52 Output:
+2018/03/24 15:17:52 {"id":"87a196436d084c608a748f6f98d0c1d6","data":{"value":"true","last":"1111","other":"crypto"}}
+```
