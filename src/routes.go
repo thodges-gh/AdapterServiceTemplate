@@ -22,6 +22,18 @@ var routes = Routes{
 		Pattern:     "/",
 		HandlerFunc: TaskRun,
 	},
+	{
+		Name:        "PendingTaskRun",
+		Method:      "POST",
+		Pattern:     "/pending",
+		HandlerFunc: PendingTaskRun,
+	},
+	{
+		Name:        "ReturnBigInt",
+		Method:      "POST",
+		Pattern:     "/big",
+		HandlerFunc: ReturnBigInt,
+	},
 	// Add more routes here if needed, keep in
 	// mind that Chainlink will POST to them for
 	// task runs.
