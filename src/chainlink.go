@@ -30,7 +30,7 @@ type Data struct {
 
 // GetData is where you woud reach out to your desired endpoint and
 // store the response in the Data struct.
-func GetData(cl Chainlink) Chainlink {
+func GetData(cl Chainlink) RunResult {
 	rr := RunResult{
 		JobRunID: cl.ID,
 		Data : Data{
@@ -46,7 +46,7 @@ func GetData(cl Chainlink) Chainlink {
 }
 
 // GetPending returns the pending field as true without data.
-func GetPending(cl Chainlink) Chainlink {
+func GetPending(cl Chainlink) RunResult {
 	rr := RunResult{
 		JobRunID: cl.ID,
 		Pending: true,

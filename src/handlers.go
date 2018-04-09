@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 )
 
 // TaskRun reads the input JSON given from the core, calls the
