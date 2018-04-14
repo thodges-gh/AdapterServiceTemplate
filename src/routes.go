@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -35,18 +36,31 @@ var routes = Routes{
 		HandlerFunc: ReturnBigInt,
 	},
 	{
-		Name:        "RESTExample",
+		Name:        "InputDataExample",
 		Method:      "POST",
-		Pattern:     "/rest/{other}",
-		HandlerFunc: RestExample,
+		Pattern:     "/input",
+		HandlerFunc: InputDataExample,
 	},
 	// Add more routes here if needed, keep in
 	// mind that Chainlink will POST to them for
 	// task runs.
 }
 
+// https://github.com/gorilla/mux#middleware
+type MiddlewareFunc func(http.Handler) http.Handler
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Do stuff here
+		log.Println(r.RequestURI)
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(w, r)
+	})
+}
+
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
+	router.Use(loggingMiddleware)
 	for _, route := range routes {
 		router.
 			Methods(route.Method).

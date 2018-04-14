@@ -16,47 +16,67 @@ $ ./ea
 
 ## Adding to Chainlink
 
-Make sure your Chainlink node is already running. For example, mine is running at localhost:6688 with a `$USERNAME` of "chainlink" and `$PASSWORD` of "twochains" (the defaults).
+Make sure your Chainlink node is already running. For example, mine is running at http://localhost:6688 and the adapter is running at http://localhost:3000.
 
 ### Add the adapter
 
 ```bash
-curl -u chainlink:twochains -X POST -H 'Content-Type: application/json' -d '{"name":"ea","url":"http://localhost:3000/"}' http://localhost:6688/v2/bridge_types
+curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"name":"ea","url":"http://localhost:3000/"}' http://localhost:6688/v2/bridge_types
 ```
 
-### Create the job
+### Create the JobSpec
 
 ```bash
-curl -u chainlink:twochains -X POST -H 'Content-Type: application/json' -d '{"initiators":[{"type":"web"}],"tasks":[{"type":"ea"}]}' http://localhost:6688/v2/specs
+curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"initiators":[{"type":"web"}],"tasks":[{"type":"ea"}]}' http://localhost:6688/v2/specs
 ```
 
+## Using the InputData example
+
+The InputData example allows for data to be passed into the adapter, and the adapter can use that to determine what to do. See the `GetInputData` function to see how that can work.
+
+### Add the BridgeType
+
+```bash
+curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"name":"inputAdapter","url":"http://localhost:3000/input"}' http://localhost:6688/v2/bridge_types
+```
+
+### Create the JobSpec
+
+```bash
+curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"initiators":[{"type":"web"}],"tasks":[{"type":"inputAdapter"},{"type":"noop"}]}' http://localhost:6688/v2/specs
+```
+
+Take note of the "id" field that is returned after running this command.
 
 ### Starting a run
 
 Be sure to change the JobID to the given output from the last command.
 
 ```bash
-curl -u chainlink:twochains -X POST http://localhost:6688/v2/specs/a0de434162de4e37817d9f0b9c12da3d/runs
+curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"other": "GetRestData"}' http://localhost:6688/v2/specs/8f7e26344a90473b82eb010a016a8ddd/runs
 ```
+
+Replace "8f7e26344a90473b82eb010a016a8ddd" with the "id" from the previous command.
 
 ## Examples
 
 Here is an example of what the log would look like for a run
 
 ```shell
-2018/03/24 15:17:52 Input:
-2018/03/24 15:17:52 {"id":"87a196436d084c608a748f6f98d0c1d6","data":{}}
-2018/03/24 15:17:52 Output:
-2018/03/24 15:17:52 {"id":"87a196436d084c608a748f6f98d0c1d6","data":{"value":"true","last":"1111","other":"crypto"}}
+2018/04/14 14:39:41 /input
+2018/04/14 14:39:41 Input:
+2018/04/14 14:39:41 {"id":"278c97ffadb54a5bbb93cfec5f7b5503","data":{"other":"GetRestData"}}
+2018/04/14 14:39:41 Output:
+2018/04/14 14:39:41 {"jobRunId":"278c97ffadb54a5bbb93cfec5f7b5503","data":{"value":"30000","last":"3333","other":"GetRestData"},"status":"completed","error":null,"pending":false}
 ```
 
 And here is what the Chainlink node will output (with debug enabled)
 
 ```shell
-{"level":"info","ts":1521923157.4895928,"caller":"web/router.go:57","msg":"Web request","method":"POST","status":200,"path":"/v2/specs/b32bddfc9eb4419f9f95dad9bfbe4cff/runs","query":"","body":"","clientIP":"::1","comment":"","servedAt":"2018/03/24 - 15:25:57","latency":"232.138µs"}
-{"level":"info","ts":1521923157.511245,"caller":"services/job_runner.go:54","msg":"Starting job","job":"b32bddfc9eb4419f9f95dad9bfbe4cff","run":"b8004e2989e24e1d8e4449afad2eb480","status":"in progress"}
-{"level":"debug","ts":1521923157.5142593,"caller":"services/job_runner.go:71","msg":"Produced task run","tr":"TaskRun(a742a5cb75544ce3bce936a24524d0c8,ea,completed,)"}
-{"level":"info","ts":1521923157.5196233,"caller":"services/job_runner.go:81","msg":"Task ea finished","task":0,"result":"","type":"ea","params":"{\"type\":\"ea\"}","taskrun":"a742a5cb75544ce3bce936a24524d0c8","status":""}
-{"level":"info","ts":1521923157.5196896,"caller":"services/job_runner.go:97","msg":"Finished current job run execution","job":"b32bddfc9eb4419f9f95dad9bfbe4cff","run":"b8004e2989e24e1d8e4449afad2eb480","status":"completed"}
-
+{"level":"info","ts":1523734781.925597,"caller":"services/job_runner.go:79","msg":"Starting job","job":"8f7e26344a90473b82eb010a016a8ddd","run":"278c97ffadb54a5bbb93cfec5f7b5503","status":"in_progress"}
+{"level":"debug","ts":1523734781.9286554,"caller":"services/job_runner.go:114","msg":"Produced task run","taskRun":"TaskRun(5ecc2bb67ace4b96975e03b138713203,inputadapter,completed,)"}
+{"level":"debug","ts":1523734781.9290605,"caller":"services/job_runner.go:115","msg":"Task inputadapter ","task":0,"result":"","type":"inputadapter","params":"{\"other\":\"GetRestData\",\"type\":\"inputAdapter\"}","taskrun":"5ecc2bb67ace4b96975e03b138713203","status":""}
+{"level":"debug","ts":1523734781.9338725,"caller":"services/job_runner.go:114","msg":"Produced task run","taskRun":"TaskRun(5c2ede41038348bd8d29d85eedd7e75f,noop,completed,)"}
+{"level":"debug","ts":1523734781.9344666,"caller":"services/job_runner.go:115","msg":"Task noop ","task":1,"result":"","type":"noop","params":"{\"other\":\"GetRestData\",\"type\":\"noop\"}","taskrun":"5c2ede41038348bd8d29d85eedd7e75f","status":""}
+{"level":"info","ts":1523734781.9385347,"caller":"services/job_runner.go:109","msg":"Finished current job run execution","job":"8f7e26344a90473b82eb010a016a8ddd","run":"278c97ffadb54a5bbb93cfec5f7b5503","status":"completed"}
 ```

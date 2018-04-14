@@ -72,12 +72,14 @@ func GetBigInt(cl Chainlink) RunResult {
 	return rr
 }
 
-// GetRestData is a test for RESTful endpoints.
-// POST to http://localhost:3000/rest/GetData to retrieve the value "10000"
-// POST to http://localhost:3000/rest/GetBigInt to retrieve the value "20000"
-// POST to http://localhost:3000/rest/GetRestData to retrieve the value "30000"
-func GetRestData(cl Chainlink, vars map[string]string) RunResult {
-	var datas = []Data{
+// GetInputData allows data to be passed into the adapter and the result
+// will be determined based on what it is given.
+// Pass in '{"other": "GetData"}' to retrieve the value "10000"
+// Pass in '{"other": "GetBigInt"}' to retrieve the value "20000"
+// Pass in '{"other": "GetRestData"}' to retrieve the value "30000"
+func GetInputData(cl Chainlink) RunResult {
+	params := cl.Data
+	datas := []Data{
 		Data{
 			Value: "10000",
 			Last:  "1111",
@@ -101,7 +103,7 @@ func GetRestData(cl Chainlink, vars map[string]string) RunResult {
 	}
 
 	for _, item := range datas {
-		if item.Other == vars["other"] {
+		if item.Other == params.Other {
 			rr.Data = item
 			break
 		}

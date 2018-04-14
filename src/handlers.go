@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 // TaskRun reads the input JSON given from the core, calls the
@@ -139,12 +137,10 @@ func ReturnBigInt(w http.ResponseWriter, r *http.Request) {
 	log.Println(string(outString))
 }
 
-// RestExample reads the input JSON given from the core, calls the
+// InputDataExample reads the input JSON given from the core, calls the
 // GetRestData method, and fulfills the request. It will log both the
 // input and output JSON for troubleshooting.
-func RestExample(w http.ResponseWriter, r *http.Request) {
-	log.Println(mux.Vars(r))
-	params := mux.Vars(r)
+func InputDataExample(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -167,7 +163,7 @@ func RestExample(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	result := GetRestData(cl, params)
+	result := GetInputData(cl)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
