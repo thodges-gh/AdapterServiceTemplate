@@ -34,6 +34,12 @@ var routes = Routes{
 		Pattern:     "/big",
 		HandlerFunc: ReturnBigInt,
 	},
+	{
+		Name:        "RESTExample",
+		Method:      "POST",
+		Pattern:     "/rest/{other}",
+		HandlerFunc: RestExample,
+	},
 	// Add more routes here if needed, keep in
 	// mind that Chainlink will POST to them for
 	// task runs.

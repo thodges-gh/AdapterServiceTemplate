@@ -3,12 +3,13 @@ package main
 import (
 	null "gopkg.in/guregu/null.v3"
 )
+
 // Chainlink contains the fields necessary for receiving the data
 // that will be sent to the adapter and for returing back to the
 // node itself.
 type Chainlink struct {
-	ID      string `json:"id"`
-	Data    Data   `json:"data"`
+	ID   string `json:"id"`
+	Data Data   `json:"data"`
 }
 
 type RunResult struct {
@@ -33,12 +34,12 @@ type Data struct {
 func GetData(cl Chainlink) RunResult {
 	rr := RunResult{
 		JobRunID: cl.ID,
-		Data : Data{
+		Data: Data{
 			Value: "SomeValue",
 			Last:  "1111",
 			Other: "GetData",
 		},
-		Status: "completed",
+		Status:  "completed",
 		Pending: false,
 	}
 
@@ -49,7 +50,7 @@ func GetData(cl Chainlink) RunResult {
 func GetPending(cl Chainlink) RunResult {
 	rr := RunResult{
 		JobRunID: cl.ID,
-		Pending: true,
+		Pending:  true,
 	}
 
 	return rr
@@ -59,13 +60,51 @@ func GetPending(cl Chainlink) RunResult {
 func GetBigInt(cl Chainlink) RunResult {
 	rr := RunResult{
 		JobRunID: cl.ID,
-		Data : Data{
-			Value: "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+		Data: Data{
+			Value: "115792089237316195423570985008687907853269984665640564039457584007913129639934",
 			Last:  "1111",
 			Other: "GetBigInt",
 		},
-		Status: "completed",
+		Status:  "completed",
 		Pending: false,
+	}
+
+	return rr
+}
+
+// GetRestData is a test for RESTful endpoints.
+// POST to http://localhost:3000/rest/GetData to retrieve the value "10000"
+// POST to http://localhost:3000/rest/GetBigInt to retrieve the value "20000"
+// POST to http://localhost:3000/rest/GetRestData to retrieve the value "30000"
+func GetRestData(cl Chainlink, vars map[string]string) RunResult {
+	var datas = []Data{
+		Data{
+			Value: "10000",
+			Last:  "1111",
+			Other: "GetData",
+		},
+		Data{
+			Value: "20000",
+			Last:  "2222",
+			Other: "GetBigInt",
+		},
+		Data{
+			Value: "30000",
+			Last:  "3333",
+			Other: "GetRestData",
+		}}
+
+	rr := RunResult{
+		JobRunID: cl.ID,
+		Status:   "completed",
+		Pending:  false,
+	}
+
+	for _, item := range datas {
+		if item.Other == vars["other"] {
+			rr.Data = item
+			break
+		}
 	}
 
 	return rr

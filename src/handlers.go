@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 // TaskRun reads the input JSON given from the core, calls the
@@ -121,6 +123,51 @@ func ReturnBigInt(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := GetBigInt(cl)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		panic(err)
+	}
+
+	// Log the output
+	outString, err := json.Marshal(result)
+	if err != nil {
+		panic(err)
+	}
+	log.Println("Output:")
+	log.Println(string(outString))
+}
+
+// RestExample reads the input JSON given from the core, calls the
+// GetRestData method, and fulfills the request. It will log both the
+// input and output JSON for troubleshooting.
+func RestExample(w http.ResponseWriter, r *http.Request) {
+	log.Println(mux.Vars(r))
+	params := mux.Vars(r)
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+
+	// Log the input
+	log.Println("Input:")
+	log.Println(string(body))
+
+	cl := Chainlink{}
+	if err := json.Unmarshal(body, &cl); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+	}
+
+	result := GetRestData(cl, params)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
