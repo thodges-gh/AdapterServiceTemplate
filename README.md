@@ -2,6 +2,14 @@
 
 This is meant to be an example for how you can set up an external adapter to make use of additional functions for a Chainlink node.
 
+## Dependencies
+
+gorilla/mux
+
+```bash
+go get github.com/gorilla/mux
+```
+
 ## Building
 
 ```bash
@@ -70,7 +78,7 @@ Here is an example of what the log would look like for a run
 2018/04/14 14:39:41 {"jobRunId":"278c97ffadb54a5bbb93cfec5f7b5503","data":{"value":"30000","last":"3333","other":"GetRestData"},"status":"completed","error":null,"pending":false}
 ```
 
-And here is what the Chainlink node will output (with debug enabled)
+And here is what the Chainlink node will log (with debug enabled)
 
 ```shell
 {"level":"info","ts":1523734781.925597,"caller":"services/job_runner.go:79","msg":"Starting job","job":"8f7e26344a90473b82eb010a016a8ddd","run":"278c97ffadb54a5bbb93cfec5f7b5503","status":"in_progress"}
