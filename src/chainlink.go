@@ -12,6 +12,8 @@ type Chainlink struct {
 	Data Data   `json:"data"`
 }
 
+// RunResult formats the response data to the format that the node
+// expects.
 type RunResult struct {
 	JobRunID     string      `json:"jobRunId"`
 	Data         Data        `json:"data"`
@@ -24,9 +26,16 @@ type RunResult struct {
 // something like JSON-to-Go to make this easy:
 // https://mholt.github.io/json-to-go/
 type Data struct {
-	Value string `json:"value,omitempty"`
-	Last  string `json:"last,omitempty"`
-	Other string `json:"other,omitempty"`
+	Value   string  `json:"value,omitempty"`
+	Details Details `json:"details,omitempty"`
+	Other   string  `json:"other,omitempty"`
+}
+
+// Details is just a simple nested JSON object.
+type Details struct {
+	Close   string `json:"close,omitempty"`
+	Open    string `json:"open,omitempty"`
+	Current string `json:"current,omitempty"`
 }
 
 // GetData is where you woud reach out to your desired endpoint and
@@ -36,7 +45,11 @@ func GetData(cl Chainlink) RunResult {
 		JobRunID: cl.ID,
 		Data: Data{
 			Value: "SomeValue",
-			Last:  "1111",
+			Details: Details{
+				Close:   "100",
+				Open:    "110",
+				Current: "111",
+			},
 			Other: "GetData",
 		},
 		Status:  "completed",
@@ -62,7 +75,11 @@ func GetBigInt(cl Chainlink) RunResult {
 		JobRunID: cl.ID,
 		Data: Data{
 			Value: "115792089237316195423570985008687907853269984665640564039457584007913129639934",
-			Last:  "1111",
+			Details: Details{
+				Close:   "100",
+				Open:    "110",
+				Current: "111",
+			},
 			Other: "GetBigInt",
 		},
 		Status:  "completed",
@@ -82,17 +99,78 @@ func GetInputData(cl Chainlink) RunResult {
 	datas := []Data{
 		Data{
 			Value: "10000",
-			Last:  "1111",
+			Details: Details{
+				Close:   "100",
+				Open:    "110",
+				Current: "111",
+			},
 			Other: "GetData",
 		},
 		Data{
 			Value: "20000",
-			Last:  "2222",
+			Details: Details{
+				Close:   "200",
+				Open:    "210",
+				Current: "211",
+			},
 			Other: "GetBigInt",
 		},
 		Data{
 			Value: "30000",
-			Last:  "3333",
+			Details: Details{
+				Close:   "300",
+				Open:    "310",
+				Current: "311",
+			},
+			Other: "GetRestData",
+		}}
+
+	rr := RunResult{
+		JobRunID: cl.ID,
+		Status:   "completed",
+		Pending:  false,
+	}
+
+	for _, item := range datas {
+		if item.Other == params.Other {
+			rr.Data = item
+			break
+		}
+	}
+
+	return rr
+}
+
+// GetReportData allows data to be passed into the adapter and the result
+// will be determined based on what it is given.
+func GetReportData(cl Chainlink) RunResult {
+	params := cl.Data
+	datas := []Data{
+		Data{
+			Value: "10000",
+			Details: Details{
+				Close:   "100",
+				Open:    "110",
+				Current: "111",
+			},
+			Other: "GetData",
+		},
+		Data{
+			Value: "20000",
+			Details: Details{
+				Close:   "200",
+				Open:    "210",
+				Current: "211",
+			},
+			Other: "GetBigInt",
+		},
+		Data{
+			Value: "30000",
+			Details: Details{
+				Close:   "300",
+				Open:    "310",
+				Current: "311",
+			},
 			Other: "GetRestData",
 		}}
 
