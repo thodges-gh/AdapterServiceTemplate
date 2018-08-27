@@ -32,22 +32,10 @@ Make sure your Chainlink node is already running. For example, mine is running a
 $ chainlink bridge '{"name":"ea","url":"http://localhost:3000/"}'
 ```
 
-Or
-
-```bash
-$ curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"name":"ea","url":"http://localhost:3000/"}' http://localhost:6688/v2/bridge_types
-```
-
 ### Create the JobSpec
 
 ```bash
 $ chainlink c '{"initiators":[{"type":"web"}],"tasks":[{"type":"ea"}]}'
-```
-
-Or
-
-```bash
-$ curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"initiators":[{"type":"web"}],"tasks":[{"type":"ea"}]}' http://localhost:6688/v2/specs
 ```
 
 ## Using the InputData example
@@ -60,22 +48,10 @@ The InputData example allows for data to be passed into the adapter, and the ada
 $ chainlink bridge '{"name":"inputAdapter","url":"http://localhost:3000/input"}'
 ```
 
-Or
-
-```bash
-$ curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"name":"inputAdapter","url":"http://localhost:3000/input"}' http://localhost:6688/v2/bridge_types
-```
-
 ### Create the JobSpec
 
 ```bash
 $ chainlink c '{"initiators":[{"type":"web"}],"tasks":[{"type":"inputAdapter"},{"type":"noop"}]}'
-```
-
-Or
-
-```bash
-$ curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"initiators":[{"type":"web"}],"tasks":[{"type":"inputAdapter"},{"type":"noop"}]}' http://localhost:6688/v2/specs
 ```
 
 Take note of the "id" field that is returned after running this command.
@@ -85,7 +61,7 @@ Take note of the "id" field that is returned after running this command.
 Be sure to change the JobID to the given output from the last command.
 
 ```bash
-$ curl -u $USERNAME:$PASSWORD -X POST -H 'Content-Type: application/json' -d '{"other": "GetRestData"}' http://localhost:6688/v2/specs/8f7e26344a90473b82eb010a016a8ddd/runs
+$ chainlink r 8f7e26344a90473b82eb010a016a8ddd
 ```
 
 Replace "8f7e26344a90473b82eb010a016a8ddd" with the "id" from the previous command.
