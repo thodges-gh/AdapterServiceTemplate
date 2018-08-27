@@ -1,6 +1,6 @@
 # External Adapter Service Template
 
-This is meant to be an example for how you can set up an external adapter to make use of additional functions for a Chainlink node.
+This is meant to be an example for how you can set up an external adapter to make use of additional functions for a Chainlink node. It is purposely repetitive in the code base (especially handlers) to make it easy to make small changes to specific endpoints. Never ever use this adapter for production use.
 
 ## Dependencies
 

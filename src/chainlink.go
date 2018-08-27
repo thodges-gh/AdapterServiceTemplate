@@ -33,9 +33,9 @@ type Data struct {
 
 // Details is just a simple nested JSON object.
 type Details struct {
-	Close   string `json:"close,omitempty"`
-	Open    string `json:"open,omitempty"`
-	Current string `json:"current,omitempty"`
+	Close   string  `json:"close,omitempty"`
+	Open    float64 `json:"open,omitempty"`
+	Current string  `json:"current,omitempty"`
 }
 
 // GetData is where you woud reach out to your desired endpoint and
@@ -46,9 +46,9 @@ func GetData(cl Chainlink) RunResult {
 		Data: Data{
 			Value: "SomeValue",
 			Details: Details{
-				Close:   "100",
-				Open:    "110",
-				Current: "111",
+				Close:   "464.11677595",
+				Open:    464.11677595,
+				Current: "464.11677595",
 			},
 			Other: "GetData",
 		},
@@ -77,7 +77,7 @@ func GetBigInt(cl Chainlink) RunResult {
 			Value: "115792089237316195423570985008687907853269984665640564039457584007913129639934",
 			Details: Details{
 				Close:   "100",
-				Open:    "110",
+				Open:    110,
 				Current: "111",
 			},
 			Other: "GetBigInt",
@@ -101,7 +101,7 @@ func GetInputData(cl Chainlink) RunResult {
 			Value: "10000",
 			Details: Details{
 				Close:   "100",
-				Open:    "110",
+				Open:    110,
 				Current: "111",
 			},
 			Other: "GetData",
@@ -110,7 +110,7 @@ func GetInputData(cl Chainlink) RunResult {
 			Value: "20000",
 			Details: Details{
 				Close:   "200",
-				Open:    "210",
+				Open:    210,
 				Current: "211",
 			},
 			Other: "GetBigInt",
@@ -119,7 +119,7 @@ func GetInputData(cl Chainlink) RunResult {
 			Value: "30000",
 			Details: Details{
 				Close:   "300",
-				Open:    "310",
+				Open:    310,
 				Current: "311",
 			},
 			Other: "GetRestData",
@@ -150,7 +150,7 @@ func GetReportData(cl Chainlink) RunResult {
 			Value: "10000",
 			Details: Details{
 				Close:   "100",
-				Open:    "110",
+				Open:    110,
 				Current: "111",
 			},
 			Other: "GetData",
@@ -159,7 +159,7 @@ func GetReportData(cl Chainlink) RunResult {
 			Value: "20000",
 			Details: Details{
 				Close:   "200",
-				Open:    "210",
+				Open:    210,
 				Current: "211",
 			},
 			Other: "GetBigInt",
@@ -168,7 +168,7 @@ func GetReportData(cl Chainlink) RunResult {
 			Value: "30000",
 			Details: Details{
 				Close:   "300",
-				Open:    "310",
+				Open:    310,
 				Current: "311",
 			},
 			Other: "GetRestData",
