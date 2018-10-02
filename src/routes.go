@@ -47,6 +47,12 @@ var routes = Routes{
 		Pattern:     "/resume",
 		HandlerFunc: ResumeFromPending,
 	},
+	{
+		Name:        "Error",
+		Method:      "POST",
+		Pattern:     "/error",
+		HandlerFunc: ReturnError,
+	},
 	// Add more routes here if needed, keep in
 	// mind that Chainlink will POST to them for
 	// task runs.

@@ -9,10 +9,9 @@ import (
 	"net/http"
 )
 
-// TaskRun reads the input JSON given from the core, calls the
-// GetData method, and fulfills the request. It will log both the
-// input and output JSON for troubleshooting.
-func TaskRun(w http.ResponseWriter, r *http.Request) {
+// RequestData makes the call to the external resources (in this case,
+// that's simulated in chainlink.go).
+func RequestData(w http.ResponseWriter, r *http.Request) Chainlink {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -39,10 +38,13 @@ func TaskRun(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	result := GetData(cl)
+	return cl
 
+}
+
+// WriteData returns the data to the requester
+func WriteData(w http.ResponseWriter, result RunResult) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Authorization", "b3a2064827904ffb9c45567e3b04d382")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
@@ -55,83 +57,28 @@ func TaskRun(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Output:")
 	log.Println(string(outString))
+}
+
+// TaskRun reads the input JSON given from the core, calls the
+// GetData method, and fulfills the request. It will log both the
+// input and output JSON for troubleshooting.
+func TaskRun(w http.ResponseWriter, r *http.Request) {
+	cl := RequestData(w, r)
+	WriteData(w, GetData(cl))
 }
 
 // PendingTaskRun reads the input JSON given from the core, calls the
 // GetPending method, and returns a RunResult with the pending status
 // set to true. It will log both the input and output JSON for troubleshooting.
 func PendingTaskRun(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
-
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-
-	// Log the input
-	log.Println("Input:")
-	log.Println(string(body))
-
-	// Log the headers
-	log.Println("Headers:")
-	log.Println(r.Header)
-
-	cl := Chainlink{}
-	if err := json.Unmarshal(body, &cl); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
-	}
-
-	result := GetPending(cl)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(result); err != nil {
-		panic(err)
-	}
-
-	// Log the output
-	outString, err := json.Marshal(result)
-	if err != nil {
-		panic(err)
-	}
-	log.Println("Output:")
-	log.Println(string(outString))
+	cl := RequestData(w, r)
+	WriteData(w, GetPending(cl))
 }
 
 // ResumeFromPending allows you to resume a pending run, given its
 // JobRunID.
 func ResumeFromPending(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
-
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-
-	// Log the input
-	log.Println("Input:")
-	log.Println(string(body))
-
-	// Log the headers
-	log.Println("Headers:")
-	log.Println(r.Header)
-
-	cl := Chainlink{}
-	if err := json.Unmarshal(body, &cl); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
-	}
+	cl := RequestData(w, r)
 
 	result := GetData(cl)
 	url := "http://localhost:6688/v2/runs/" + cl.ID
@@ -156,108 +103,27 @@ func ResumeFromPending(w http.ResponseWriter, r *http.Request) {
 	responseBody, _ := ioutil.ReadAll(resp.Body)
 	log.Println("response Body:", string(responseBody))
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(req.Body); err != nil {
-		panic(err)
-	}
-
-	// Log the output
-	
-	log.Println("Output:")
-	log.Println(string(outString))
+	WriteData(w, result)
 }
 
 // ReturnBigInt reads the input JSON given from the core, calls the
 // GetBigInt method, and fulfills the request. It will log both the
 // input and output JSON for troubleshooting.
 func ReturnBigInt(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
-
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-
-	// Log the input
-	log.Println("Input:")
-	log.Println(string(body))
-
-	// Log the headers
-	log.Println("Headers:")
-	log.Println(r.Header)
-
-	cl := Chainlink{}
-	if err := json.Unmarshal(body, &cl); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
-	}
-
-	result := GetBigInt(cl)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(result); err != nil {
-		panic(err)
-	}
-
-	// Log the output
-	outString, err := json.Marshal(result)
-	if err != nil {
-		panic(err)
-	}
-	log.Println("Output:")
-	log.Println(string(outString))
+	cl := RequestData(w, r)
+	WriteData(w, GetBigInt(cl))
 }
 
 // InputDataExample reads the input JSON given from the core, calls the
 // GetRestData method, and fulfills the request. It will log both the
 // input and output JSON for troubleshooting.
 func InputDataExample(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
+	cl := RequestData(w, r)
+	WriteData(w, GetInputData(cl))
+}
 
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-
-	// Log the input
-	log.Println("Input:")
-	log.Println(string(body))
-
-	// Log the headers
-	log.Println("Headers:")
-	log.Println(r.Header)
-
-	cl := Chainlink{}
-	if err := json.Unmarshal(body, &cl); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
-	}
-
-	result := GetInputData(cl)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(result); err != nil {
-		panic(err)
-	}
-
-	// Log the output
-	outString, err := json.Marshal(result)
-	if err != nil {
-		panic(err)
-	}
-	log.Println("Output:")
-	log.Println(string(outString))
+// ReturnError returns an error back to the caller
+func ReturnError(w http.ResponseWriter, r *http.Request) {
+	cl := RequestData(w, r)
+	WriteData(w, GetError(cl))
 }

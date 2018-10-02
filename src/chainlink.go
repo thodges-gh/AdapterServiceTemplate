@@ -1,8 +1,5 @@
 package main
 
-import (
-	null "gopkg.in/guregu/null.v3"
-)
 
 // Chainlink contains the fields necessary for receiving the data
 // that will be sent to the adapter and for returing back to the
@@ -18,7 +15,7 @@ type RunResult struct {
 	JobRunID     string      `json:"jobRunId"`
 	Data         Data        `json:"data"`
 	Status       string      `json:"status"`
-	ErrorMessage null.String `json:"error"`
+	ErrorMessage string `json:"error"`
 	Pending      bool        `json:"pending"`
 }
 
@@ -46,8 +43,8 @@ func GetData(cl Chainlink) RunResult {
 		Data: Data{
 			Value: "SomeValue",
 			Details: Details{
-				Close:   "464.11677595",
-				Open:    464.11677595,
+				Close:   "9223372036854775808",
+				Open:    9223372036854775808,
 				Current: "464.11677595",
 			},
 			Other: "GetData",
@@ -185,6 +182,18 @@ func GetReportData(cl Chainlink) RunResult {
 			rr.Data = item
 			break
 		}
+	}
+
+	return rr
+}
+
+// GetError returns an error object to the caller
+func GetError(cl Chainlink) RunResult {
+	rr := RunResult{
+		JobRunID: cl.ID,
+		Status:  "errored",
+		ErrorMessage: "There was an error",
+		Pending: false,
 	}
 
 	return rr
